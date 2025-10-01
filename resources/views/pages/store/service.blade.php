@@ -69,39 +69,71 @@
                         </select>
                     </div>
                     <div class="mb-4">
-                        <div class="box-employee d-flex align-items-center gap-2 border rounded bg-white p-2">
-                            <span id="employee-label" class="ms-auto">عدد الموظفين</span>
+                        <div
+                            class="box-employee d-flex flex-wrap align-items-center justify-content-between gap-2 border rounded bg-white p-2">
+                            <span id="employee-label" class="flex-grow-1">عدد الموظفين</span>
 
-                            <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex flex-wrap align-items-center gap-2">
                                 <button type="button" class="btn btn-select-employee btn-sm">15</button>
                                 <button type="button" class="btn btn-select-employee btn-sm">30</button>
                                 <button type="button" class="btn btn-select-employee btn-sm">50</button>
 
-                                <input type="number" id="employee-input" class="form-control form-control-sm w-auto"
-                                    placeholder="تخصيص عدد معين" min="1">
+                                <input type="number" id="employee-input" class="form-control form-control-sm"
+                                    placeholder="تخصيص عدد معين" min="1" style="max-width: 120px;">
                             </div>
                         </div>
                     </div>
-                    <div class="mb-4 box-employee border rounded bg-dark p-2">
-                        <label class="d-block mb-2 font-weight-bold">المنصة</label>
 
-                        <div class="d-flex flex-wrap">
-                            <div class="form-check mr-3 m-3">
-                                <label class="form-check-label me-3" for="platform1">فيسبوك</label>
+                    <div class="mb-4 box-employee border rounded bg-white p-3">
+                        <label class="title d-block mb-2 font-weight-bold">المنصة</label>
+
+                        <div class="d-flex flex-wrap gap-4">
+
+                            <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="platform1" value="facebook">
+                                <label class="title-platform form-check-label ms-2" for="platform1">فيسبوك</label>
                             </div>
 
-                            <div class="form-check mr-3 m-3">
-                                <label class="form-check-label me-3" for="platform2">إكس</label>
+                            <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="platform2" value="x">
+                                <label class="title-platform form-check-label ms-2" for="platform2">إكس</label>
                             </div>
 
-                            <div class="form-check mr-3 m-3">
-                                <label class="form-check-label me-3" for="platform3">انستجرام</label>
+                            <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="platform3" value="instagram">
+                                <label class="title-platform form-check-label ms-2" for="platform3">انستجرام</label>
                             </div>
+
                         </div>
                     </div>
+
+                    <div class="mb-4 box-employee border rounded bg-white p-3">
+                        <label class="title d-block mb-2 font-weight-bold">المنصة</label>
+
+                        <div class="d-flex flex-wrap gap-4">
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="platform" id="platform1"
+                                    value="facebook">
+                                <label class="title-platform form-check-label ms-2" for="platform1">فيسبوك</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="platform" id="platform2"
+                                    value="x">
+                                <label class="title-platform form-check-label ms-2" for="platform2">إكس</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="platform" id="platform3"
+                                    value="instagram">
+                                <label class="title-platform form-check-label ms-2" for="platform3">انستجرام</label>
+                            </div>
+
+                        </div>
+                    </div>
+
+
 
                     <div class="mb-4">
                         <div class="price-box mb-3 d-flex justify-content-between align-items-center ">
@@ -117,8 +149,25 @@
                             <div class="price-value">200</div>
                         </div>
                     </div>
+
+                    <div class="form-check form-check-reverse mt-4 mb-5">
+                        <input class="form-check-input terms" type="checkbox" id="terms" required>
+                        <label class="form-check-label text-white" for="terms">
+                            أوافق على الشروط والأحكام
+                        </label>
+                    </div>
+
                     <button type="submit" class="btn btn-send w-100">حجز</button>
                 </form>
+            </div>
+
+            <div class="condition mt-5">
+                <h4>سياسة الاسترجاع</h4>
+                <p>
+                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aperiam tenetur nesciunt laboriosam possimus
+                    tempore officiis accusantium, est ipsam, rem quibusdam assumenda! Aspernatur voluptatum sapiente facere
+                    vero ipsa? Esse, voluptatibus aut!
+                </p>
             </div>
 
         </div>
