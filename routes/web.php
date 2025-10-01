@@ -37,7 +37,6 @@ Route::get('/blogs-details/{id}', function ($id) {
 
     return view('pages.blogs-details', compact('blog', 'suggestions'));
 })->name('blogs.details');
-
 // Store
 Route::get('/store', [StoreController::class, 'index'])->name('store.index');
 Route::get('/store/category/{id}', [StoreController::class, 'category'])->name('store.category');

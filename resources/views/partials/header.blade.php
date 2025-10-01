@@ -11,7 +11,7 @@
 
         <div class="collapse navbar-collapse justify-content-between" id="navbarContent">
             @php
-                $current = request()->path();
+            $current = request()->path();
             @endphp
 
             <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-3">
@@ -43,14 +43,6 @@
                     </a> --}}
                     <a class="nav-link {{ $current == 'portfolio' ? 'active' : '' }}" href="{{ url('/portfolio') }}">
                         عملائنا
-                    </a>
-                </li>
-                <li class="nav-item">
-                    {{-- <a class="nav-link {{ $current == 'portfolio' ? 'active' : '' }}" href="{{ url('/') }}">
-                    Portfolio
-                    </a> --}}
-                    <a class="nav-link {{ $current == 'store' ? 'active' : '' }}" href="{{ url('/store') }}">
-                        المتجر
                     </a>
                 </li>
 
@@ -184,8 +176,8 @@
                     </a>
                 </li>
         </div> --}}
-            </ul>
+        </ul>
 
-        </div>
+    </div>
     </div>
 </nav>
