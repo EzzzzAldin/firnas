@@ -11,29 +11,16 @@
         <div class="container">
             <div id="imageCarousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <div class="text-center px-2">
-                            <img src="{{ asset('assets/imgs/ishraq-01.webp') }}" alt="Slide 1"
-                                class="carousel-image open-modal" data-bs-toggle="modal" data-bs-target="#imageModal"
-                                data-img="{{ asset('assets/imgs/ishraq-01.webp') }}">
+                    @forelse ($product->slider as $item)
+                        <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                            <div class="text-center px-2">
+                                <img src="{{ asset('storage/' . $item) }}" alt="Slide 1" class="carousel-image open-modal"
+                                    data-bs-toggle="modal" data-bs-target="#imageModal"
+                                    data-img="{{ asset('assets/imgs/ishraq-01.webp') }}">
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="carousel-item">
-                        <div class="text-center px-2">
-                            <img src="{{ asset('assets/imgs/ishraq-01.webp') }}" alt="Slide 2"
-                                class="carousel-image open-modal" data-bs-toggle="modal" data-bs-target="#imageModal"
-                                data-img="{{ asset('assets/imgs/ishraq-01.webp') }}">
-                        </div>
-                    </div>
-
-                    <div class="carousel-item">
-                        <div class="text-center px-2">
-                            <img src="{{ asset('assets/imgs/ishraq-01.webp') }}" alt="Slide 3"
-                                class="carousel-image open-modal" data-bs-toggle="modal" data-bs-target="#imageModal"
-                                data-img="{{ asset('assets/imgs/ishraq-01.webp') }}">
-                        </div>
-                    </div>
+                    @empty
+                    @endforelse
                 </div>
 
                 <div class="carousel-indicators custom-indicators position-static mt-3">
@@ -47,17 +34,21 @@
             </div>
 
             <div class="info-system mt-5 mb-5">
-                <h3 class="mb-3">اسم الخدمة CRM</h3>
-                <p>الـ CRM هو نظام بيساعد الشركات تدير علاقتها بالعملاء، تتابع المبيعات، وتحسّن تجربة العميل عشان تزود ولاءه
-                    للشركة.</p>
+                <h3 class="mb-3">{{ $product->name }}</h3>
+                <p>{{ $product->dis }}</p>
             </div>
 
             <div class="form-service">
                 <h3>للاشتراك في الخدمة أملئ الاستمارة التاليه</h3>
                 <form action="POST" class="mt-5">
                     <div class="mb-4">
+                        @dd($product->questions)
+                    {{-- text --}}
                         <input type="text" class="form-control" id="name" placeholder="ادخل اسم الشركة" required>
                     </div>
+
+                    {{-- select --}}
+
                     <div class="mb-4">
                         <select name="filed" id="filed" class="form-select custom-select-rtl" required>
                             <option value="" disabled selected>اختر مجال الشركة</option>
@@ -68,6 +59,8 @@
                             <option value="other">مجال آخر</option>
                         </select>
                     </div>
+
+                    {{-- number --}}
                     <div class="mb-4">
                         <div
                             class="box-employee d-flex flex-wrap align-items-center justify-content-between gap-2 border rounded bg-white p-2">
@@ -84,6 +77,7 @@
                         </div>
                     </div>
 
+                    {{-- chickbox --}}
                     <div class="mb-4 box-employee border rounded bg-white p-3">
                         <label class="title d-block mb-2 font-weight-bold">المنصة</label>
 
@@ -107,6 +101,7 @@
                         </div>
                     </div>
 
+                    {{-- chickbox --}}
                     <div class="mb-4 box-employee border rounded bg-white p-3">
                         <label class="title d-block mb-2 font-weight-bold">المنصة</label>
 
@@ -132,7 +127,6 @@
 
                         </div>
                     </div>
-
 
 
                     <div class="mb-4">

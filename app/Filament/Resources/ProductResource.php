@@ -35,19 +35,21 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')->label('Name'),
+                TextInput::make('name')->label('Name')->required(),
                 Select::make('services_id')
                     ->relationship('service', 'name')
-                    ->label('Service'),
+                    ->label('Service')->required(),
 
                 FileUpload::make('image')->columnSpanFull()->label('Image')
                     ->disk('public'),
 
+                TextInput::make('price')->label('Price')->required(),
+
                 Textarea::make('dis')
                     ->columnSpanFull()
-                    ->label('Description'),
+                    ->label('Description')->required(),
 
-                    FileUpload::make('slider')->label('Slider Images')->multiple()->columnSpanFull()->disk('public'),
+                FileUpload::make('slider')->label('Slider Images')->multiple()->columnSpanFull()->disk('public'),
                 Repeater::make('questions')
                     ->schema([
                         Select::make('type_question')
@@ -56,19 +58,38 @@ class ProductResource extends Resource
                                 'text' => 'Text',
                                 'select' => 'Select',
                                 'radio' => 'Radio',
+                                'chickbox' => 'Chickbox',
+                                'number' => 'Number',
                             ])
                             ->required()
                             ->live()
                             ->default('text'),
 
                         TextInput::make('question')->visible(fn(callable $get) => in_array($get('type_question'), ['text'])),
+                        TextInput::make('price')->label('The Price')->visible(fn(callable $get) => in_array($get('type_question'), ['text'])),
+
+                        TextInput::make('question')->label('Question')->visible(fn(callable $get) => in_array($get('type_question'), ['number'])),
+                        TagsInput::make('answers')->label('The Options Numbers')->placeholder('New Number')
+                            ->visible(fn(callable $get) => in_array($get('type_question'), ['number'])),
+                        TagsInput::make('price')->label('Put the prices in order according to the options you have set')->placeholder('Next Price')
+                            ->visible(fn(callable $get) => in_array($get('type_question'), ['number'])),
 
                         TextInput::make('question')->label('The Question')->visible(fn(callable $get) => in_array($get('type_question'), ['select'])),
                         TagsInput::make('answers')->label('The Answers')->placeholder('New Option')
                             ->visible(fn(callable $get) => in_array($get('type_question'), ['select'])),
+                        TagsInput::make('price')->label('Put the prices in order according to the options you have set.')->placeholder('Next Price')
+                            ->visible(fn(callable $get) => in_array($get('type_question'), ['select'])),
 
                         TextInput::make('question')->label('The Question')->visible(fn(callable $get) => in_array($get('type_question'), ['radio'])),
+                        Radio::make('yesOrNo')->options(
+                            ['Yes', 'No']
+                        )->label('Do you want to add a question about the number of designs and posts? ')->visible(fn(callable $get) => in_array($get('type_question'), ['radio'])),
                         TagsInput::make('answers')->label('Radio Options')->placeholder('New Radio')->visible(fn(callable $get) => in_array($get('type_question'), ['radio'])),
+                        TagsInput::make('price')->label('Put the prices in order according to the options you have set.')->placeholder('Next Price')->visible(fn(callable $get) => in_array($get('type_question'), ['radio'])),
+
+                        TextInput::make('question')->label('The Question')->visible(fn(callable $get) => in_array($get('type_question'), ['chickbox'])),
+                        TagsInput::make('answers')->label('Chickbox Options')->placeholder('New Chickbox')->visible(fn(callable $get) => in_array($get('type_question'), ['chickbox'])),
+                        TagsInput::make('price')->label('Put the prices in order according to the options you have set.')->placeholder('Next Price')->visible(fn(callable $get) => in_array($get('type_question'), ['chickbox'])),
                     ])->columnSpanFull()
             ]);
     }
