@@ -15,150 +15,28 @@
 
         <div class="container my-5">
             <div class="row g-4">
-                <div class="col-md-3 col-sm-6">
-                    <div class="card-cat mb-5 h-100 text-end">
-                        <a href="{{ route('store.service', 1) }}">
-                            <img src="{{ asset('assets/imgs/image 5.png') }}" class="card-img-top" alt="خدمات التسويق">
-                        </a>
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{{ route('store.service', 1) }}" class="text-decoration-none text-end">
-                                    خدمات التسويق
-                                </a>
-                            </h5>
-                            <p class="card-text text-end">
-                                الـ CRM هو نظام بيساعد الشركات تدير علاقتها بالعملاء، تابع الوسائط، وحسّن تجربة العميل عشان
-                                تزود مبيعات الشركة
-                            </p>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="col-md-3 col-sm-6">
-                    <div class="card-cat mb-5 h-100 text-end">
-                        <a href="{{ route('store.service', 2) }}">
-                            <img src="{{ asset('assets/imgs/image 5.png') }}" class="card-img-top" alt="خدمات التصميم">
-                        </a>
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{{ route('store.service', 2) }}" class="text-decoration-none text-end">
-                                    خدمات التصميم
-                                </a>
-                            </h5>
-                            <p class="card-text text-end">
-                                تصميم احترافي للشعارات وواجهات المستخدم يساعد على إبراز هوية شركتك بشكل مميز ويشد العملاء
-                            </p>
+                @forelse ($service->products as $item)
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card-cat mb-5 h-100 text-end">
+                            <a href="{{ route('store.service', $item->id) }}">
+                                <img src="{{ asset('storage/' . $item->image) }}" class="card-img-top" alt="خدمات التسويق">
+                            </a>
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="{{ route('store.service', $item->id) }}" class="text-decoration-none text-end">
+                                        {{ $item->name }}
+                                    </a>
+                                </h5>
+                                <p class="card-text text-end">
+                                    {{ \Illuminate\Support\Str::limit($item->dis, 50) }}
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="card-cat mb-5 h-100 text-end">
-                        <a href="{{ route('store.service', 1) }}">
-                            <img src="{{ asset('assets/imgs/image 5.png') }}" class="card-img-top" alt="خدمات التسويق">
-                        </a>
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{{ route('store.service', 1) }}" class="text-decoration-none text-end">
-                                    خدمات التسويق
-                                </a>
-                            </h5>
-                            <p class="card-text text-end">
-                                الـ CRM هو نظام بيساعد الشركات تدير علاقتها بالعملاء، تابع الوسائط، وحسّن تجربة العميل عشان
-                                تزود مبيعات الشركة
-                            </p>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="col-md-3 col-sm-6">
-                    <div class="card-cat mb-5 h-100 text-end">
-                        <a href="{{ route('store.service', 2) }}">
-                            <img src="{{ asset('assets/imgs/image 5.png') }}" class="card-img-top" alt="خدمات التصميم">
-                        </a>
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{{ route('store.service', 2) }}" class="text-decoration-none text-end">
-                                    خدمات التصميم
-                                </a>
-                            </h5>
-                            <p class="card-text text-end">
-                                تصميم احترافي للشعارات وواجهات المستخدم يساعد على إبراز هوية شركتك بشكل مميز ويشد العملاء
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="card-cat mb-5 h-100 text-end">
-                        <a href="{{ route('store.service', 1) }}">
-                            <img src="{{ asset('assets/imgs/image 5.png') }}" class="card-img-top" alt="خدمات التسويق">
-                        </a>
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{{ route('store.service', 1) }}" class="text-decoration-none text-end">
-                                    خدمات التسويق
-                                </a>
-                            </h5>
-                            <p class="card-text text-end">
-                                الـ CRM هو نظام بيساعد الشركات تدير علاقتها بالعملاء، تابع الوسائط، وحسّن تجربة العميل عشان
-                                تزود مبيعات الشركة
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-3 col-sm-6">
-                    <div class="card-cat mb-5 h-100 text-end">
-                        <a href="{{ route('store.service', 2) }}">
-                            <img src="{{ asset('assets/imgs/image 5.png') }}" class="card-img-top" alt="خدمات التصميم">
-                        </a>
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{{ route('store.service', 2) }}" class="text-decoration-none text-end">
-                                    خدمات التصميم
-                                </a>
-                            </h5>
-                            <p class="card-text text-end">
-                                تصميم احترافي للشعارات وواجهات المستخدم يساعد على إبراز هوية شركتك بشكل مميز ويشد العملاء
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="card-cat mb-5 h-100 text-end">
-                        <a href="{{ route('store.service', 1) }}">
-                            <img src="{{ asset('assets/imgs/image 5.png') }}" class="card-img-top" alt="خدمات التسويق">
-                        </a>
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{{ route('store.service', 1) }}" class="text-decoration-none text-end">
-                                    خدمات التسويق
-                                </a>
-                            </h5>
-                            <p class="card-text text-end">
-                                الـ CRM هو نظام بيساعد الشركات تدير علاقتها بالعملاء، تابع الوسائط، وحسّن تجربة العميل عشان
-                                تزود مبيعات الشركة
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-3 col-sm-6">
-                    <div class="card-cat mb-5 h-100 text-end">
-                        <a href="{{ route('store.service', 2) }}">
-                            <img src="{{ asset('assets/imgs/image 5.png') }}" class="card-img-top" alt="خدمات التصميم">
-                        </a>
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{{ route('store.service', 2) }}" class="text-decoration-none text-end">
-                                    خدمات التصميم
-                                </a>
-                            </h5>
-                            <p class="card-text text-end">
-                                تصميم احترافي للشعارات وواجهات المستخدم يساعد على إبراز هوية شركتك بشكل مميز ويشد العملاء
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                @empty
+                @endforelse
 
             </div>
         </div>

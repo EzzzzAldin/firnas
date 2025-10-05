@@ -18,7 +18,7 @@ class StoreController extends Controller
     public function category($id)
     {
         $service = Services::with('products')->findOrFail($id);
-
+      
         return view('pages.store.category', compact('service'));
     }
 

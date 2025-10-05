@@ -16,7 +16,7 @@
                             <div class="text-center px-2">
                                 <img src="{{ asset('storage/' . $item) }}" alt="Slide 1" class="carousel-image open-modal"
                                     data-bs-toggle="modal" data-bs-target="#imageModal"
-                                    data-img="{{ asset('assets/imgs/ishraq-01.webp') }}">
+                                    data-img="{{ asset('storage/' . $item) }}">
                             </div>
                         </div>
                     @empty
@@ -37,96 +37,123 @@
                 <h3 class="mb-3">{{ $product->name }}</h3>
                 <p>{{ $product->dis }}</p>
             </div>
-
+            @php
+                $textQuestions = collect($product->questions)->filter(function ($q) {
+                    return $q['type_question'] === 'text';
+                });
+                $selectQuestions = collect($product->questions)->filter(function ($q) {
+                    return $q['type_question'] === 'select';
+                });
+                $chickboxQuestions = collect($product->questions)->filter(function ($q) {
+                    return $q['type_question'] === 'chickbox';
+                });
+                $numberQuestions = collect($product->questions)->filter(function ($q) {
+                    return $q['type_question'] === 'number';
+                });
+                $radioQuestions = collect($product->questions)->filter(function ($q) {
+                    return $q['type_question'] === 'radio';
+                });
+            @endphp
             <div class="form-service">
                 <h3>للاشتراك في الخدمة أملئ الاستمارة التاليه</h3>
                 <form action="POST" class="mt-5">
                     <div class="mb-4">
-                        @dd($product->questions)
-                    {{-- text --}}
-                        <input type="text" class="form-control" id="name" placeholder="ادخل اسم الشركة" required>
+
+                        {{-- text --}}
+                        @forelse ($textQuestions as $item)
+                            <input type="text" class="form-control" id="name" placeholder="{{ $item['question'] }}"
+                                required>
+                            <input type="hidden" name="textPrice" value="{{ $item['price'] }}">
+                        @empty
+                        @endforelse
+
+
                     </div>
 
                     {{-- select --}}
+                    @forelse ($selectQuestions as $item)
+                        <div class="mb-4">
+                            <select name="filed" id="filed" class="form-select custom-select-rtl" required>
+                                <option value="" disabled selected>{{ $item['question'] }}</option>
+                                @forelse ($item['answers'] as $answer)
+                                    <option value="{{ $answer }}">{{ $answer }}</option>
+                                @empty
+                                @endforelse
+                            </select>
+                        </div>
 
-                    <div class="mb-4">
-                        <select name="filed" id="filed" class="form-select custom-select-rtl" required>
-                            <option value="" disabled selected>اختر مجال الشركة</option>
-                            <option value="tech">تكنولوجيا</option>
-                            <option value="health">صحة</option>
-                            <option value="education">تعليم</option>
-                            <option value="finance">تمويل</option>
-                            <option value="other">مجال آخر</option>
-                        </select>
-                    </div>
-
+                    @empty
+                    @endforelse
                     {{-- number --}}
-                    <div class="mb-4">
-                        <div
-                            class="box-employee d-flex flex-wrap align-items-center justify-content-between gap-2 border rounded bg-white p-2">
-                            <span id="employee-label" class="flex-grow-1">عدد الموظفين</span>
+                    @forelse ($numberQuestions as $item)
+                        <div class="mb-4">
+                            <div
+                                class="box-employee d-flex flex-wrap align-items-center justify-content-between gap-2 border rounded bg-white p-2">
+                                <span id="employee-label" class="flex-grow-1">{{ $item['question'] }}</span>
 
-                            <div class="d-flex flex-wrap align-items-center gap-2">
-                                <button type="button" class="btn btn-select-employee btn-sm">15</button>
-                                <button type="button" class="btn btn-select-employee btn-sm">30</button>
-                                <button type="button" class="btn btn-select-employee btn-sm">50</button>
 
-                                <input type="number" id="employee-input" class="form-control form-control-sm"
-                                    placeholder="تخصيص عدد معين" min="1" style="max-width: 120px;">
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    @forelse ($item['answers'] as $answer)
+                                        <button type="button"
+                                            class="btn btn-select-employee btn-sm">{{ $answer }}</button>
+
+                                    @empty
+                                    @endforelse
+                                    <input type="number" name="numberE" id="employee-input"
+                                        class="form-control form-control-sm" placeholder="تخصيص عدد معين" min="1"
+                                        style="max-width: 120px;">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
+                    @empty
+                    @endforelse
+                    {{-- chickboxQuestions --}}
                     {{-- chickbox --}}
-                    <div class="mb-4 box-employee border rounded bg-white p-3">
-                        <label class="title d-block mb-2 font-weight-bold">المنصة</label>
+                    @forelse ($chickboxQuestions as $item)
 
-                        <div class="d-flex flex-wrap gap-4">
+                        <div class="mb-4 box-employee border rounded bg-white p-3">
+                            <label class="title d-block mb-2 font-weight-bold">{{ $item['question'] }}</label>
 
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="platform1" value="facebook">
-                                <label class="title-platform form-check-label ms-2" for="platform1">فيسبوك</label>
+                            <div class="d-flex flex-wrap gap-4">
+                                @forelse ($item['answers'] as $key => $answer)
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="platform1-{{ $key }}"
+                                            value="{{ $answer }}">
+                                        <label class="title-platform form-check-label ms-2"
+                                            for="platform1-{{ $key }}">{{ $answer }}</label>
+                                    </div>
+                                @empty
+                                @endforelse
                             </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="platform2" value="x">
-                                <label class="title-platform form-check-label ms-2" for="platform2">إكس</label>
-                            </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="platform3" value="instagram">
-                                <label class="title-platform form-check-label ms-2" for="platform3">انستجرام</label>
-                            </div>
-
                         </div>
-                    </div>
 
-                    {{-- chickbox --}}
-                    <div class="mb-4 box-employee border rounded bg-white p-3">
-                        <label class="title d-block mb-2 font-weight-bold">المنصة</label>
+                    @empty
 
-                        <div class="d-flex flex-wrap gap-4">
+                    @endforelse
 
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="platform" id="platform1"
-                                    value="facebook">
-                                <label class="title-platform form-check-label ms-2" for="platform1">فيسبوك</label>
+                    {{-- radio --}}
+                    @forelse ($radioQuestions as $item)
+                        <div class="mb-4 box-employee border rounded bg-white p-3">
+                            <label class="title d-block mb-2 font-weight-bold">{{ $item['question'] }}</label>
+
+                            <div class="d-flex flex-wrap gap-4">
+                                @forelse ($item['answers'] as $key => $answer)
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="platform"
+                                            id="platform2-{{ $key }}" value="{{ $answer }}">
+                                        <label class="title-platform form-check-label ms-2"
+                                            for="platform2-{{ $key }}">{{ $answer }}</label>
+                                    </div>
+                                @empty
+                                @endforelse
+
                             </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="platform" id="platform2"
-                                    value="x">
-                                <label class="title-platform form-check-label ms-2" for="platform2">إكس</label>
-                            </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="platform" id="platform3"
-                                    value="instagram">
-                                <label class="title-platform form-check-label ms-2" for="platform3">انستجرام</label>
-                            </div>
-
                         </div>
-                    </div>
+
+                    @empty
+
+                    @endforelse
 
 
                     <div class="mb-4">

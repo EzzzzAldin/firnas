@@ -14,9 +14,8 @@ class Services extends Model
         'image',
     ];
 
-    public function Services() {
-        $this->hasMany(Product::class,'services_id');
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'services_id');
     }
-
-
 }

@@ -15,84 +15,23 @@
 
         <div class="container my-5">
             <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card-store mb-5 text-center">
-                        <a href="{{ route('store.category', 1) }}">
-                            <img src="{{ asset('assets/imgs/image 2.png') }}" class="img-fluid w-100"
-                                alt="Category Image" />
-                        </a>
-                        <h5 class="mt-3">
-                            <a href="{{ route('store.category', 1) }}" class="text-decoration-none title-store">
-                                الخدمات البرمجية
+                @forelse ($services as $item)
+                    <div class="col-md-4">
+                        <div class="card-store mb-5 text-center">
+                            <a href="{{ route('store.category', $item->id) }}">
+                                <img src="{{ asset('storage/' . $item->image) }}" class="img-fluid w-100"
+                                    alt="Category Image" />
                             </a>
-                        </h5>
+                            <h5 class="mt-3">
+                                <a href="{{ route('store.category', $item->id) }}" class="text-decoration-none title-store">
+                                    {{ $item->name }}
+                                </a>
+                            </h5>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card-store mb-5 text-center">
-                        <a href="{{ route('store.category', 1) }}">
-                            <img src="{{ asset('assets/imgs/image 2.png') }}" class="img-fluid w-100"
-                                alt="Category Image" />
-                        </a>
-                        <h5 class="mt-3">
-                            <a href="{{ route('store.category', 1) }}" class="text-decoration-none title-store">
-                                الخدمات البرمجية
-                            </a>
-                        </h5>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card-store mb-5 text-center">
-                        <a href="{{ route('store.category', 1) }}">
-                            <img src="{{ asset('assets/imgs/image 2.png') }}" class="img-fluid w-100"
-                                alt="Category Image" />
-                        </a>
-                        <h5 class="mt-3">
-                            <a href="{{ route('store.category', 1) }}" class="text-decoration-none title-store">
-                                الخدمات البرمجية
-                            </a>
-                        </h5>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card-store mb-5 text-center">
-                        <a href="{{ route('store.category', 1) }}">
-                            <img src="{{ asset('assets/imgs/image 2.png') }}" class="img-fluid w-100"
-                                alt="Category Image" />
-                        </a>
-                        <h5 class="mt-3">
-                            <a href="{{ route('store.category', 1) }}" class="text-decoration-none title-store">
-                                الخدمات البرمجية
-                            </a>
-                        </h5>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card-store mb-5 text-center">
-                        <a href="{{ route('store.category', 1) }}">
-                            <img src="{{ asset('assets/imgs/image 2.png') }}" class="img-fluid w-100"
-                                alt="Category Image" />
-                        </a>
-                        <h5 class="mt-3">
-                            <a href="{{ route('store.category', 1) }}" class="text-decoration-none title-store">
-                                الخدمات البرمجية
-                            </a>
-                        </h5>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card-store mb-5 text-center">
-                        <a href="{{ route('store.category', 1) }}">
-                            <img src="{{ asset('assets/imgs/image 2.png') }}" class="img-fluid w-100"
-                                alt="Category Image" />
-                        </a>
-                        <h5 class="mt-3">
-                            <a href="{{ route('store.category', 1) }}" class="text-decoration-none title-store">
-                                الخدمات البرمجية
-                            </a>
-                        </h5>
-                    </div>
-                </div>
+                @empty
+                @endforelse
+
             </div>
         </div>
 
