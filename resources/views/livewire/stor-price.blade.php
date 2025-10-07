@@ -28,6 +28,7 @@
             <h3 class="mb-3">{{ $product->name }}</h3>
             <p>{{ $product->dis }}</p>
         </div>
+        {{-- @dd($product)
         @php
             $textQuestions = collect($product->questions)->filter(function ($q) {
                 return $q['type_question'] === 'text';
@@ -44,122 +45,120 @@
             $radioQuestions = collect($product->questions)->filter(function ($q) {
                 return $q['type_question'] === 'radio';
             });
-        @endphp
+        @endphp --}}
+
+        {{-- تم إزالة كود الـ @php من هنا لأنه لم يعد ضرورياً --}}
+
         <div class="form-service">
             <h3>للاشتراك في الخدمة أملئ الاستمارة التاليه</h3>
-            <form action="POST" class="mt-5">
-                <div class="mb-4">
 
-                    {{-- text --}}
-                    @forelse ($textQuestions as $item)
-                        <input type="text" class="form-control" id="name" placeholder="{{ $item['question'] }}"
-                            required>
-                        <input type="hidden" name="textPrice" value="{{ $item['price'] }}">
-                    @empty
-                    @endforelse
-
-
-                </div>
-
-                {{-- select --}}
-                @forelse ($selectQuestions as $item)
-                    <div class="mb-4">
-                        <select name="filed" id="filed" class="form-select custom-select-rtl" required>
-                            <option value="" disabled selected>{{ $item['question'] }}</option>
-                            @forelse ($item['answers'] as $answer)
-                                <option value="{{ $answer }}">{{ $answer }}</option>
-                            @empty
-                            @endforelse
-                        </select>
-                    </div>
-
-                @empty
-                @endforelse
-                {{-- number --}}
-                @forelse ($numberQuestions as $item)
-                    <div class="mb-4">
-                        <div
-                            class="box-employee d-flex flex-wrap align-items-center justify-content-between gap-2 border rounded bg-white p-2">
-                            <span id="employee-label" class="flex-grow-1">{{ $item['question'] }}</span>
-
-
-                            <div class="d-flex flex-wrap align-items-center gap-2">
-                                @forelse ($item['answers'] as $answer)
-                                    <button type="button"
-                                        class="btn btn-select-employee btn-sm">{{ $answer }}</button>
-
-                                @empty
-                                @endforelse
-                                <input type="number" name="numberE" id="employee-input"
-                                    class="form-control form-control-sm" placeholder="تخصيص عدد معين" min="1"
-                                    style="max-width: 120px;">
+            {{-- لا نستخدم action="POST" مع Livewire لأنها تدير الإرسال بنفسها --}}
+            <form action="{{ route('order.submit', $product->id) }}" method="POST" class="mt-5">
+                @csrf
+                {{-- حلقة واحدة رئيسية لعرض جميع الأسئلة --}}
+                @foreach ($product->questions as $questionIndex => $question)
+                    @switch($question['type_question'])
+                        {{-- 1. Text --}}
+                        @case('text')
+                            <div class="mb-4">
+                                <input type="text" class="form-control" placeholder="{{ $question['question'] }}" required>
+                                {{-- لا داعي لإضافة سعر هنا --}}
                             </div>
-                        </div>
-                    </div>
+                        @break
 
-                @empty
-                @endforelse
-                {{-- chickboxQuestions --}}
-                {{-- chickbox --}}
-                @forelse ($chickboxQuestions as $item)
+                        {{-- 2. Select --}}
+                        @case('select')
+                            <div class="mb-4">
+                                {{-- ربط الـ select بالمتغير في الكومبوننت --}}
+                                <select wire:model.live="selectedAnswers.{{ $questionIndex }}"
+                                    class="form-select custom-select-rtl" required>
+                                    <option value="" class="title" selected>{{ $question['question'] }}</option>
+                                    @foreach ($question['answers'] as $answerIndex => $answer)
+                                        {{-- القيمة هي الـ index --}}
+                                        <option value="{{ $answerIndex }}">{{ $answer }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @break
 
-                    <div class="mb-4 box-employee border rounded bg-white p-3">
-                        <label class="title d-block mb-2 font-weight-bold">{{ $item['question'] }}</label>
-
-                        <div class="d-flex flex-wrap gap-4">
-                            @forelse ($item['answers'] as $key => $answer)
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="platform1-{{ $key }}"
-                                        value="{{ $answer }}">
-                                    <label class="title-platform form-check-label ms-2"
-                                        for="platform1-{{ $key }}">{{ $answer }}</label>
+                        {{-- 3. Number (Treated as Radio Buttons) --}}
+                        @case('number')
+                            <div class="mb-4">
+                                <div
+                                    class="box-employee d-flex flex-wrap align-items-center justify-content-between gap-2 border rounded bg-white p-2">
+                                    <span class="employee-label flex-grow-1">{{ $question['question'] }}</span>
+                                    <div class="d-flex flex-wrap align-items-center gap-2" role="group">
+                                        {{-- سنعرض الأرقام كخيارات راديو --}}
+                                        @foreach ($question['answers'] as $answerIndex => $answer)
+                                            <input type="radio" class="btn-check" name="question_{{ $questionIndex }}"
+                                                id="num_{{ $questionIndex }}_{{ $answerIndex }}" value="{{ $answerIndex }}"
+                                                wire:model.live="selectedAnswers.{{ $questionIndex }}" autocomplete="off">
+                                            <label class="btn btn-outline-primary btn-sm"
+                                                for="num_{{ $questionIndex }}_{{ $answerIndex }}">{{ $answer }}</label>
+                                        @endforeach
+                                    </div>
                                 </div>
-                            @empty
-                            @endforelse
-                        </div>
-                    </div>
+                            </div>
+                        @break
 
-                @empty
-
-                @endforelse
-
-                {{-- radio --}}
-                @forelse ($radioQuestions as $item)
-                    <div class="mb-4 box-employee border rounded bg-white p-3">
-                        <label class="title d-block mb-2 font-weight-bold">{{ $item['question'] }}</label>
-
-                        <div class="d-flex flex-wrap gap-4">
-                            @forelse ($item['answers'] as $key => $answer)
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="platform"
-                                        id="platform2-{{ $key }}" value="{{ $answer }}">
-                                    <label class="title-platform form-check-label ms-2"
-                                        for="platform2-{{ $key }}">{{ $answer }}</label>
+                        {{-- 4. Checkbox --}}
+                        @case('chickbox')
+                            {{-- انتبه للخطأ الإملائي --}}
+                            <div class="mb-4 box-employee border rounded bg-white p-3">
+                                <label class="title d-block mb-2 font-weight-bold">{{ $question['question'] }}</label>
+                                <div class="d-flex flex-wrap gap-4">
+                                    @foreach ($question['answers'] as $answerIndex => $answer)
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                id="chk_{{ $questionIndex }}_{{ $answerIndex }}" value="{{ $answerIndex }}"
+                                                wire:model.live="selectedAnswers.{{ $questionIndex }}">
+                                            <label class="form-check-label ms-2"
+                                                for="chk_{{ $questionIndex }}_{{ $answerIndex }}">{{ $answer }}</label>
+                                        </div>
+                                    @endforeach
                                 </div>
-                            @empty
-                            @endforelse
+                            </div>
+                        @break
 
-                        </div>
-                    </div>
+                        {{-- 5. Radio --}}
+                        @case('radio')
+                            <div class="mb-4 box-employee border rounded bg-white p-3">
+                                <label class="title  d-block mb-2 font-weight-bold">{{ $question['question'] }}</label>
+                                <div class="d-flex flex-wrap gap-4">
+                                    @foreach ($question['answers'] as $answerIndex => $answer)
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="question_{{ $questionIndex }}"
+                                                id="rad_{{ $questionIndex }}_{{ $answerIndex }}" value="{{ $answerIndex }}"
+                                                wire:model.live="selectedAnswers.{{ $questionIndex }}">
+                                            <label class="form-check-label ms-2"
+                                                for="rad_{{ $questionIndex }}_{{ $answerIndex }}">{{ $answer }}</label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @break
+                    @endswitch
+                @endforeach
 
-                @empty
 
-                @endforelse
-
-
+                {{-- قسم عرض السعر --}}
                 <div class="mb-4">
                     <div class="price-box mb-3 d-flex justify-content-between align-items-center ">
                         <div class="price">السعر</div>
-                        <div class="price-value">200</div>
+                        {{-- استخدام الخاصية المحسوبة لعرض السعر الإجمالي --}}
+                        <div class="price-value">{{ $this->totalPrice() }} EGP
+                            <input type="hidden" name="totalPrice" value="{{ $this->totalPrice() }}">
+                        </div>
                     </div>
-                    <div class="price-box mb-3 d-flex justify-content-between align-items-center ">
+                    {{-- يمكنك إضافة منطق الخصم هنا بنفس الطريقة --}}
+                    {{-- <div class="price-box mb-3 d-flex justify-content-between align-items-center ">
                         <div class="price">الخصم</div>
                         <div class="discount-value">200</div>
                     </div>
                     <div class="price-box mb-3 d-flex justify-content-between align-items-center ">
                         <div class="price">الاجمالي</div>
-                        <div class="price-value">200</div>
-                    </div>
+                        <div class="price-value">{{ $this->totalPrice() - 200 }}</div>
+                    </div> --}}
                 </div>
 
                 <div class="form-check form-check-reverse mt-4 mb-5">

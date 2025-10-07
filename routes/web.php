@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\WelcomeController;
 
@@ -14,7 +15,9 @@ Route::get('/generate-sitemap', function () {
 
     return 'Sitemap generated!';
 });
-
+// payment
+Route::post('/orders-submit/{id}', [OrderController::class, 'initiatePayment'])->name('order.submit');
+Route::get('/callback', [OrderController::class, 'handleCallback']);
 // Blogs
 Route::get('/blogs', function () {
     $blogs = config('blogs');

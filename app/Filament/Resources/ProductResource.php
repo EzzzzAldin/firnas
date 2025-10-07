@@ -66,7 +66,7 @@ class ProductResource extends Resource
                             ->default('text'),
 
                         TextInput::make('question')->visible(fn(callable $get) => in_array($get('type_question'), ['text'])),
-                        TextInput::make('price')->label('The Price')->visible(fn(callable $get) => in_array($get('type_question'), ['text']))->default(0),
+                        // TextInput::make('price')->label('The Price')->visible(fn(callable $get) => in_array($get('type_question'), ['text']))->default(0),
 
                         TextInput::make('question')->label('Question')->visible(fn(callable $get) => in_array($get('type_question'), ['number'])),
                         TagsInput::make('answers')->label('The Options Numbers')->placeholder('New Number')

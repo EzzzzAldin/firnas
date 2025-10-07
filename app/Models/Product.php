@@ -12,6 +12,7 @@ class Product extends Model
         'name',
         'services_id',
         'image',
+        'price',
         'dis',
         'questions',
         'slider'

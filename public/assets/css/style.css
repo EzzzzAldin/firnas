@@ -3218,7 +3218,7 @@ body.modal-open .navbar {
     padding: 5px 16px;
 }
 
-#employee-label {
+.employee-label {
     font-size: 1rem;
     font-weight: 500;
     color: var(--main-color);
