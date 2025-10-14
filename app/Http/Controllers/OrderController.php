@@ -1,151 +1,183 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use App\Models\Order;
 use App\Models\Product;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
-    // public function index()  {
-    //     $orders = Order::all();
-    //     return view('order.index',compact('orders'));
-    // }
-
-    // public function create()  {
-    //     return view('order.create');
-    // }
-
-    public function store(Request $request)
+    public function createSession(Request $request, $id)
     {
-        $request->validate([
-            'product_name' => 'required|string|max:255',
-            'price' => 'required|numeric',
+        $product = Product::findOrFail($id);
+
+        $currency = "EGP";
+        $amount = number_format($product->price, 2, '.', '');
+        $orderId = uniqid('ORD_');
+
+        $customerEmail = $request->input('email', 'guest@example.com');
+        $customerMobile = $request->input('mobile', '01000000000');
+        $customerName = $request->input('name', 'Guest User');
+
+        // إنشاء الطلب في قاعدة البيانات
+        $order = Order::create([
+            'user_id' => null,
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'price' => $amount,
+            'currency' => $currency,
+            'payment_status' => 'Pending',
+            'customer_email' => $customerEmail,
+            'customer_mobile' => $customerMobile,
+            'customer_name' => $customerName,
+            'order_reference' => $orderId,
         ]);
 
-        Order::create($request->all());
-        return redirect()->route('order.index')->with('success', 'Order created successfully.');
-    }
+        $merchantId = env('KASHIER_MERCHANT_ID');
+        $apiKey = env('KASHIER_API_KEY');
+        $secretKey = env('KASHIER_SECRET_KEY');
 
-    public function initiatePayment(Request $request, $id)
-    {
+        // 🧭 API endpoint (test/live)
+        $endpoint = "https://test-api.kashier.io/v3/payment/sessions";
 
-        $totalPrice = $request->totalPrice;
-        $order = Product::find($id);
-        $currency = "USD"; //your currency
+        // 🕒 بيانات الـ Session
+        $payload = [
+            "expireAt" => now()->addDay()->toIso8601String(),
+            "maxFailureAttempts" => 3,
+            "paymentType" => "credit",
+            "amount" => $amount,
+            "currency" => $currency,
+            "orderId" => (string) $order->id,
+            "merchantRedirect" => route('payment.callback'),
+            "display" => "en",
+            "type" => "one-time",
+            "allowedMethods" => "card,wallet",
+            "redirectMethod" => "get",
+            "iframeBackgroundColor" => "#FFFFFF",
+            "metaData" => [
+                "customKey" => "customValue",
+                "displayNotes" => ["order_ref" => $orderId],
+            ],
+            "merchantId" => $merchantId,
+            "failureRedirect" => route('payment.failed'),
+            "brandColor" => "#FF5733",
+            "defaultMethod" => "card",
+            "description" => "Payment for order {$orderId}",
+            "manualCapture" => false,
+            "customer" => [
+                "email" => $customerEmail,
+                "reference" => $customerMobile,
+                "name" => $customerName,
+            ],
+            "saveCard" => "optional",
+            "retrieveSavedCard" => true,
+            "interactionSource" => "ECOMMERCE",
+            "enable3DS" => true,
+            "serverWebhook" => route('webhook.kashier'),
+            "notes" => "Special handling required"
+        ];
 
-        $kashierOrderHash = $this->generateKashierOrderHash($order, $currency, $totalPrice);
-        $paymentUrl = "https://checkout.kashier.io/?merchantId=MID-39252-773" .
-            "&mode=test" .
-            "&orderId={$order->id}" .
-            "&amount={$totalPrice}" .
-            "&currency={$currency}" .
-            "&hash={$kashierOrderHash}" .
-            "&allowedMethods=card,bank_installments,wallet,fawry" .
-            "&merchantRedirect=" . urlencode('http://localhost:8000/callback') .
-            "&failureRedirect=" . urlencode('http://localhost:8000/failure') .
-            "&redirectMethod=get" .
-            "&brandColor=%2300bcbc" .
-            "&display=en";
-        return redirect()->away($paymentUrl);
-    }
+        // 🔐 إرسال الطلب
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer {$secretKey}",
+            'api-key' => $apiKey,
+            'Content-Type' => 'application/json',
+        ])->post($endpoint, $payload);
 
+        $data = $response->json();
+        Log::info('Kashier create session response:', $data ?? ['raw' => $response->body()]);
 
-    private function generateKashierOrderHash($order, $currency, $totalPrice)
-    {
-        $mid = "MID-39252-773"; //your merchant id
-        $amount = $totalPrice; //eg: 100
-        $currency = $currency;
-        $orderId = $order->id; //eg: 99, your system order ID
-        $secret = "b21ba6f8-9a34-4263-bd7a-8d3a83ade2cc";
-        $path = "/?payment=" . $mid . "." . $orderId . "." . $amount . "." . $currency . (isset($CustomerReference) ? ("." . $CustomerReference) : null);
-        $hash = hash_hmac('sha256', $path, $secret, false);
-        return $hash;
+        // ✅ في حالة النجاح
+        $sessionUrl = $data['sessionUrl'] ?? $data['session']['url'] ?? null;
+        if ($response->successful() && $sessionUrl) {
+            $order->update([
+                'payment_session_id' => $data['_id'] ?? null,
+            ]);
+            return redirect()->away($sessionUrl);
+        }
+
+        // ❌ في حالة الفشل
+        return response()->json([
+            'status' => $response->status(),
+            'error' => $response->body(),
+        ], $response->status());
     }
 
     public function handleCallback(Request $request)
     {
-        // Define your secret API key
-        $secret = 'b21ba6f8-9a34-4263-bd7a-8d3a83ade2cc';
-        // Log the incoming request
-        Log::info('Callback hit with parameters: ', $request->all());
+        $paymentStatus = $request->query('paymentStatus', 'UNKNOWN');
+        $orderId = $request->query('merchantOrderId') ?? $request->query('orderId');
+        $transactionId = $request->query('transactionId');
 
-        // Build the query string
-        $queryString = "";
-        foreach ($request->query() as $key => $value) {
-            if ($key === "signature" || $key === "mode") {
-                continue;
-            }
-            $queryString .= "&{$key}={$value}";
+        Log::info('Kashier callback received', $request->all());
+
+        $order = Order::find($orderId);
+        if (!$order) {
+            return redirect('/store')->with('message', '⚠ Order not found.');
         }
 
-        // Trim the leading '&'
-        $queryString = ltrim($queryString, "&");
-
-        // Generate the signature
-        $signature = hash_hmac('sha256', $queryString, $secret, false);
-
-        // Check if the signature is valid
-        if ($signature === $request->query("signature")) {
-            // Signature is valid
-            $paymentStatus = $request->query('paymentStatus');
-            $orderId = $request->query('merchantOrderId');
-            $transactionId = $request->query('transactionId');
-
-            // Update the order based on the payment status
-            $order = Order::find($orderId);
-
-            if ($paymentStatus === 'SUCCESS') {
-                // Clear the user's cart
-                // 'CartModel'::where('user_id', Auth::user()->id)->delete();
-
-                // Update the order status to completed
+        switch ($paymentStatus) {
+            case 'SUCCESS':
                 $order->update([
                     'payment_transaction_id' => $transactionId,
-                    'payment_method' => 'online-payment',
-                    'payment_status' => "Completed",
+                    'payment_status' => 'Completed',
                 ]);
+                return redirect('/store')->with('message', '✅ Payment completed successfully.');
 
-                return "تم عملية الدفع بنجاح";
-                // Send confirmation email
-                try {
-                    // Mail::to('youmail@gmail.com')->send('new Mail($order)');
-                } catch (\Exception $e) {
-                    Log::error('Email sending failed: ', ['error' => $e->getMessage()]);
-                }
-                return redirect('/orders')->with('status', 'payment done successfully');
-            } elseif ($paymentStatus === 'CANCELLED') {
+            case 'FAILED':
+                $order->update(['payment_status' => 'Failed']);
+                return redirect('/store')->with('message', '❌ Payment failed.');
 
-                // Update the order status to cancelled
-                $order->update([
-                    'payment_transaction_id' => $transactionId,
-                    'payment_method' => 'online-payment',
-                    'payment_status' => "Cancelled"
-                ]);
-                return "عملية ملغاه";
-                // return redirect('/orders')->with('status', 'Payment cancelled. Please try again.');
-            } else {
+            case 'CANCELLED':
+                $order->update(['payment_status' => 'Cancelled']);
+                return redirect('/store')->with('message', '🚫 Payment was cancelled.');
 
-                // Update the order status to failed
-                $order->update([
-                    'payment_transaction_id' => $transactionId,
-                    'payment_method' => 'online-payment',
-                    'payment_status' => "Failed"
-                ]);
-                return "لم تتم عملية الدفع";
-                // return redirect('/orders')->with('status', 'Payment failed. Please try again.');
-            }
-
-            // Redirect to the thank-you page
-            return redirect('/thankyou');
-        } else {
-            // Invalid signature
-            Log::error('Invalid signature: ', $request->all());
-            return redirect('/orders')->with('status', 'Invalid signature. Please try again.');
+            default:
+                return redirect('/store')->with('message', '⚠ Unknown payment status.');
         }
+    }
+
+    public function webhook(Request $request)
+    {
+        $payload = $request->all();
+        Log::info('Kashier Webhook received:', $payload);
+
+        $orderId = $payload['data']['merchantOrderId']
+            ?? $payload['data']['orderId']
+            ?? $payload['data']['merchantOrderReference']
+            ?? null;
+
+        if (!$orderId) {
+            return response('Invalid payload', 400);
+        }
+
+        $status = $payload['data']['status'] ?? 'UNKNOWN';
+        $transactionId = $payload['data']['transactionId'] ?? null;
+
+        $order = Order::find($orderId);
+        if (!$order) {
+            return response('Order not found', 404);
+        }
+
+        switch ($status) {
+            case 'SUCCESS':
+                $order->update([
+                    'payment_transaction_id' => $transactionId,
+                    'payment_status' => 'Completed',
+                ]);
+                break;
+            case 'FAILED':
+                $order->update(['payment_status' => 'Failed']);
+                break;
+            case 'CANCELLED':
+                $order->update(['payment_status' => 'Cancelled']);
+                break;
+        }
+
+        return response('Webhook processed', 200);
     }
 }

@@ -56,9 +56,22 @@
             <form action="{{ route('order.submit', $product->id) }}" method="POST" class="mt-5">
                 @csrf
                 {{-- حلقة واحدة رئيسية لعرض جميع الأسئلة --}}
+                {{-- 1. Text --}}
+                <div class="mb-4">
+                    <input type="text" class="form-control" name="name" placeholder="الاسم" required>
+                    {{-- لا داعي لإضافة سعر هنا --}}
+                </div>
+                <div class="mb-4">
+                    <input type="email" class="form-control" name="email" placeholder="البريد الإلكتروني"
+                        required>
+                    {{-- لا داعي لإضافة سعر هنا --}}
+                </div>
+                <div class="mb-4">
+                    <input type="text" class="form-control" name="mobile" placeholder="رقم الموبايل" required>
+                    {{-- لا داعي لإضافة سعر هنا --}}
+                </div>
                 @foreach ($product->questions as $questionIndex => $question)
                     @switch($question['type_question'])
-                        {{-- 1. Text --}}
                         @case('text')
                             <div class="mb-4">
                                 <input type="text" class="form-control" placeholder="{{ $question['question'] }}" required>
