@@ -16,8 +16,23 @@ Route::get('/generate-sitemap', function () {
     return 'Sitemap generated!';
 });
 // payment
-Route::post('/orders-submit/{id}', [OrderController::class, 'initiatePayment'])->name('order.submit');
-Route::get('/callback', [OrderController::class, 'handleCallback']);
+// 🛒 إنشاء جلسة الدفع
+Route::post('/orders-submit/{id}', [OrderController::class, 'createSession'])
+    ->name('order.submit');
+
+// 🔁 صفحة العودة بعد الدفع (Callback)
+Route::get('/callback', [OrderController::class, 'handleCallback'])
+    ->name('payment.callback');
+
+// ❌ صفحة فشل الدفع (تظهر عند failureRedirect)
+Route::get('/payment-failed', function () {
+    return redirect('/store')->with('message', '❌ Payment failed. Please try again.');
+})->name('payment.failed');
+
+// 🔔 Webhook من Kashier (الخادم → الخادم)
+Route::post('/webhook/kashier', [OrderController::class, 'webhook'])
+    ->name('webhook.kashier');
+
 // Blogs
 Route::get('/blogs', function () {
     $blogs = config('blogs');
