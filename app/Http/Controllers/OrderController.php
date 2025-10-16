@@ -39,15 +39,17 @@ class OrderController extends Controller
         $currency = "USD"; //your currency
 
         $kashierOrderHash = $this->generateKashierOrderHash($order, $currency, $totalPrice);
+
         $paymentUrl = "https://checkout.kashier.io/?merchantId=MID-39252-773" .
             "&mode=test" .
-            "&orderId={$order->id}" .
+            "&merchantOrderId={$order->id}" . // ✅ استخدم merchantOrderId مش orderId
+            "&orderId={$order->id}" . // ممكن تسيبه كمان لو حابب
             "&amount={$totalPrice}" .
             "&currency={$currency}" .
             "&hash={$kashierOrderHash}" .
             "&allowedMethods=card,bank_installments,wallet,fawry" .
-            "&merchantRedirect=" . urlencode('http://localhost:8000/callback') .
-            "&failureRedirect=" . urlencode('http://localhost:8000/failure') .
+            "&merchantRedirect=" . urlencode('http://firnas_30_9_2025.test/callback') .
+            "&failureRedirect=" . urlencode('http://firnas_30_9_2025.test/failure') .
             "&redirectMethod=get" .
             "&brandColor=%2300bcbc" .
             "&display=en";
@@ -69,83 +71,54 @@ class OrderController extends Controller
 
     public function handleCallback(Request $request)
     {
-        // Define your secret API key
         $secret = 'b21ba6f8-9a34-4263-bd7a-8d3a83ade2cc';
-        // Log the incoming request
         Log::info('Callback hit with parameters: ', $request->all());
 
-        // Build the query string
         $queryString = "";
         foreach ($request->query() as $key => $value) {
-            if ($key === "signature" || $key === "mode") {
-                continue;
-            }
+            if ($key === "signature" || $key === "mode") continue;
             $queryString .= "&{$key}={$value}";
         }
-
-        // Trim the leading '&'
         $queryString = ltrim($queryString, "&");
 
-        // Generate the signature
         $signature = hash_hmac('sha256', $queryString, $secret, false);
 
-        // Check if the signature is valid
         if ($signature === $request->query("signature")) {
-            // Signature is valid
             $paymentStatus = $request->query('paymentStatus');
-            $orderId = $request->query('merchantOrderId');
+            $merchantOrderId = $request->query('merchantOrderId'); // ✅ ده اللي بنستخدمه
             $transactionId = $request->query('transactionId');
 
-            // Update the order based on the payment status
-            $order = Order::find($orderId);
+            $order = Order::find($merchantOrderId);
+
+            if (!$order) {
+                return redirect('/store')->with('message', '⚠ Order not found.');
+            }
 
             if ($paymentStatus === 'SUCCESS') {
-                // Clear the user's cart
-                // 'CartModel'::where('user_id', Auth::user()->id)->delete();
-
-                // Update the order status to completed
                 $order->update([
                     'payment_transaction_id' => $transactionId,
                     'payment_method' => 'online-payment',
                     'payment_status' => "Completed",
                 ]);
-
-                return "تم عملية الدفع بنجاح";
-                // Send confirmation email
-                try {
-                    // Mail::to('youmail@gmail.com')->send('new Mail($order)');
-                } catch (\Exception $e) {
-                    Log::error('Email sending failed: ', ['error' => $e->getMessage()]);
-                }
-                return redirect('/orders')->with('status', 'payment done successfully');
+                return redirect('/store')->with('message', '✅ تم الدفع بنجاح');
             } elseif ($paymentStatus === 'CANCELLED') {
-
-                // Update the order status to cancelled
                 $order->update([
                     'payment_transaction_id' => $transactionId,
                     'payment_method' => 'online-payment',
                     'payment_status' => "Cancelled"
                 ]);
-                return "عملية ملغاه";
-                // return redirect('/orders')->with('status', 'Payment cancelled. Please try again.');
+                return redirect('/store')->with('message', '🚫 تم إلغاء العملية');
             } else {
-
-                // Update the order status to failed
                 $order->update([
                     'payment_transaction_id' => $transactionId,
                     'payment_method' => 'online-payment',
                     'payment_status' => "Failed"
                 ]);
-                return "لم تتم عملية الدفع";
-                // return redirect('/orders')->with('status', 'Payment failed. Please try again.');
+                return redirect('/store')->with('message', '❌ فشلت عملية الدفع');
             }
-
-            // Redirect to the thank-you page
-            return redirect('/thankyou');
         } else {
-            // Invalid signature
             Log::error('Invalid signature: ', $request->all());
-            return redirect('/orders')->with('status', 'Invalid signature. Please try again.');
+            return redirect('/store')->with('message', '⚠ توقيع غير صالح.');
         }
     }
 }

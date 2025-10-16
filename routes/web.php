@@ -129,5 +129,5 @@ Route::get('/chatbot/questions', [ChatbotController::class, 'getQuestions']);
 Route::post('/chatbot/answer', [ChatbotController::class, 'storeAnswer']);
 Route::post('/chatbot/authenticate', [ChatbotController::class, 'authenticateUser'])->name('chatbot.authenticate');
 Route::post('/chatbot/logout', [ChatbotController::class, 'logout'])->name('chatbot.logout');
-Route::post('/welcome/store', [WelcomeController::class, 'store'])->name('welcome.store');
+// Route::post('/welcome/store', [WelcomeController::class, 'store'])->name('welcome.store');
 Route::get('/chatbot/history', [ChatbotController::class, 'history']);
