@@ -116,7 +116,7 @@ class OrderController extends Controller
 
         Log::info('Kashier callback received', $request->all());
 
-        $order = Order::find($orderId);
+        $order = Order::where('order_reference', $orderId)->first();
         if (!$order) {
             return redirect('/store')->with('message', '⚠️ Order not found.');
         }
