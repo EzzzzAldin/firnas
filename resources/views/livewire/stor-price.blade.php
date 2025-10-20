@@ -62,8 +62,7 @@
                     {{-- لا داعي لإضافة سعر هنا --}}
                 </div>
                 <div class="mb-4">
-                    <input type="email" class="form-control" name="email" placeholder="البريد الإلكتروني"
-                        required>
+                    <input type="email" class="form-control" name="email" placeholder="البريد الإلكتروني" required>
                     {{-- لا داعي لإضافة سعر هنا --}}
                 </div>
                 <div class="mb-4">
@@ -159,9 +158,13 @@
                     <div class="price-box mb-3 d-flex justify-content-between align-items-center ">
                         <div class="price">السعر</div>
                         {{-- استخدام الخاصية المحسوبة لعرض السعر الإجمالي --}}
-                        <div class="price-value">{{ $this->totalPrice() }} EGP
+                        {{-- <div class="price-value">{{ $this->totalPrice() }} EGP
                             <input type="hidden" name="totalPrice" value="{{ $this->totalPrice() }}">
-                        </div>
+                        </div> --}}
+                        @if (!collect($selectedAnswers)->every(fn($a) => is_null($a) || $a === '' || $a === []))
+                            <div class="price-value">{{ $this->totalPrice() }} EGP</div>
+                        @endif
+
                     </div>
                     {{-- يمكنك إضافة منطق الخصم هنا بنفس الطريقة --}}
                     {{-- <div class="price-box mb-3 d-flex justify-content-between align-items-center ">
@@ -180,8 +183,9 @@
                         أوافق على الشروط والأحكام
                     </label>
                 </div>
-
-                <button type="submit" class="btn btn-send w-100">حجز</button>
+                @if (!collect($selectedAnswers)->every(fn($a) => is_null($a) || $a === '' || $a === []))
+                    <button type="submit" class="btn btn-send w-100">حجز</button>
+                @endif
             </form>
         </div>
 
@@ -195,4 +199,5 @@
         </div>
 
     </div>
+
 </div>

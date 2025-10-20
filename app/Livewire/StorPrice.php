@@ -40,15 +40,26 @@ class StorPrice extends Component
      * ستقوم بحساب السعر الإجمالي تلقائيًا كلما تغيرت قيمة $selectedAnswers
      */
     #[Computed]
+
     public function totalPrice()
     {
+        // نتحقق أولاً إذا كل الإجابات فاضية
+        $allEmpty = collect($this->selectedAnswers)->every(function ($answer) {
+            return is_null($answer) || $answer === '' || $answer === [] || $answer === false;
+        });
+
+        // لو كلها فاضية → نرجع السعر الأساسي فقط بدون حساب أي إضافات
+        if ($allEmpty) {
+            return (float) $this->product->price;
+        }
+
         // نبدأ بالسعر الأساسي للمنتج
         $total = (float) $this->product->price;
 
+        // نضيف الأسعار بناءً على الإجابات المختارة
         foreach ($this->product->questions as $questionIndex => $question) {
             $selection = $this->selectedAnswers[$questionIndex] ?? null;
 
-            // إذا لم يقم المستخدم بالاختيار، ننتقل للسؤال التالي
             if (is_null($selection) || $selection === '' || $selection === []) {
                 continue;
             }
@@ -56,25 +67,19 @@ class StorPrice extends Component
             switch ($question['type_question']) {
                 case 'select':
                 case 'radio':
-                case 'number': // سنعتبر أزرار الأرقام كأنها radio buttons
+                case 'number':
                     $selectedIndex = (int) $selection;
-                    // نضيف السعر المرتبط بالإجابة المحددة
                     if (isset($question['price'][$selectedIndex])) {
                         $total += (float) $question['price'][$selectedIndex];
                     }
                     break;
 
-                case 'chickbox': // تصحيح الخطأ الإملائي هنا إذا قمت بتعديله في قاعدة البيانات
-                    // بما أن الإجابات عبارة عن مصفوفة من الـ indices
+                case 'chickbox':
                     foreach ($selection as $selectedIndex) {
-                         if (isset($question['price'][$selectedIndex])) {
+                        if (isset($question['price'][$selectedIndex])) {
                             $total += (float) $question['price'][$selectedIndex];
                         }
                     }
-                    break;
-
-                // أسئلة الـ text ليس لها سعر كما ذكرت
-                case 'text':
                     break;
             }
         }
@@ -85,6 +90,7 @@ class StorPrice extends Component
 
     public function render()
     {
+        $this->totalPrice();
         return view('livewire.stor-price');
     }
 }
