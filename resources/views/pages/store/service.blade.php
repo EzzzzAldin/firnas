@@ -9,7 +9,7 @@
         <img src="{{ asset('assets/imgs/Frame 67.webp') }}" alt="Bottom Right" class="decor-bottom-right" />
         <img src="{{ asset('assets/imgs/Frame 67.webp') }}" alt="Bottom Right" class="decor-bottom-right-top" />
 
-        <livewire:stor-price :product="$product" >
+        <livewire:stor-price :product="$product">
     </section>
 
     <!-- Modal -->
@@ -39,27 +39,38 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const label = document.getElementById("employee-label");
-            const buttons = document.querySelectorAll(".btn-select-employee");
-            const input = document.getElementById("employee-input");
+            document.querySelectorAll(".box-employee").forEach(box => {
+                const label = box.querySelector(".employee-label");
+                const buttons = box.querySelectorAll(".btn-outline-primary");
+                const inputs = box.querySelectorAll(".employee-input");
 
-            buttons.forEach(btn => {
-                btn.addEventListener("click", function() {
-                    const value = this.textContent.trim();
-                    label.textContent = value + " موظف";
-                    input.value = "";
+                // لما المستخدم يختار رقم من الأزرار (radio)
+                buttons.forEach(btn => {
+                    btn.addEventListener("click", function() {
+                        const value = this.textContent.trim();
+                        if (label) {
+                            label.textContent = value + " موظف";
+                        }
+                    });
                 });
-            });
 
-            input.addEventListener("input", function(e) {
-                const value = e.target.value.trim();
-                if (value && !isNaN(value)) {
-                    label.textContent = value + " موظف";
-                } else {
-                    label.textContent = "عدد الموظفين";
-                }
+                // في حالة كتابة رقم يدوي (لو موجود)
+                inputs.forEach(input => {
+                    input.addEventListener("input", function(e) {
+                        const value = e.target.value.trim();
+                        if (label) {
+                            if (value && !isNaN(value)) {
+                                label.textContent = value + " موظف";
+                            } else {
+                                label.textContent = "عدد الموظفين";
+                            }
+                        }
+                    });
+                });
             });
         });
     </script>
+
+
 @endsection
 @livewireScripts

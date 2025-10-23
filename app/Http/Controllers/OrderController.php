@@ -13,7 +13,7 @@ class OrderController extends Controller
     public function createSession(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-
+        dd($request);
 
         $currency = "EGP";
         $amount = number_format($product->price, 2, '.', '');

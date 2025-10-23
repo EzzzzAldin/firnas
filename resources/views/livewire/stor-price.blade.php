@@ -73,7 +73,9 @@
                     @switch($question['type_question'])
                         @case('text')
                             <div class="mb-4">
-                                <input type="text" class="form-control" placeholder="{{ $question['question'] }}" required>
+                                <input type="text" class="form-control" name="answer[]"
+                                    placeholder="{{ $question['question'] }}" required>
+                                <input type="hidden" value="{{ $question['question'] }}" name="question[]">
                                 {{-- لا داعي لإضافة سعر هنا --}}
                             </div>
                         @break
@@ -82,12 +84,14 @@
                         @case('select')
                             <div class="mb-4">
                                 {{-- ربط الـ select بالمتغير في الكومبوننت --}}
+                                <input type="hidden" value="{{ $question['question'] }}" name="question[]">
                                 <select wire:model.live="selectedAnswers.{{ $questionIndex }}"
-                                    class="form-select custom-select-rtl" required>
+                                    class="form-select custom-select-rtl" required name="answer[]">
                                     <option value="" class="title" selected>{{ $question['question'] }}</option>
                                     @foreach ($question['answers'] as $answerIndex => $answer)
                                         {{-- القيمة هي الـ index --}}
-                                        <option value="{{ $answerIndex }}">{{ $answer }}</option>
+                                        <option value="{{ $answer }}" data-index="{{ $answerIndex }}">
+                                            {{ $answer }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -101,10 +105,13 @@
                                     <span class="employee-label flex-grow-1">{{ $question['question'] }}</span>
                                     <div class="d-flex flex-wrap align-items-center gap-2" role="group">
                                         {{-- سنعرض الأرقام كخيارات راديو --}}
+                                        <input type="hidden" value="{{ $question['question'] }}" name="question[]">
                                         @foreach ($question['answers'] as $answerIndex => $answer)
-                                            <input type="radio" class="btn-check" name="question_{{ $questionIndex }}"
-                                                id="num_{{ $questionIndex }}_{{ $answerIndex }}" value="{{ $answerIndex }}"
+                                            <input type="radio" class="btn-check employee-input" name="answer[]"
+                                                id="num_{{ $questionIndex }}_{{ $answerIndex }}" value="{{ $answer }}"
+                                                data-index="{{ $answerIndex }}"
                                                 wire:model.live="selectedAnswers.{{ $questionIndex }}" autocomplete="off">
+
                                             <label class="btn btn-outline-primary btn-sm"
                                                 for="num_{{ $questionIndex }}_{{ $answerIndex }}">{{ $answer }}</label>
                                         @endforeach
@@ -119,11 +126,14 @@
                             <div class="mb-4 box-employee border rounded bg-white p-3">
                                 <label class="title d-block mb-2 font-weight-bold">{{ $question['question'] }}</label>
                                 <div class="d-flex flex-wrap gap-4">
+                                    <input type="hidden" value="{{ $question['question'] }}" name="question[]">
                                     @foreach ($question['answers'] as $answerIndex => $answer)
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox"
-                                                id="chk_{{ $questionIndex }}_{{ $answerIndex }}" value="{{ $answerIndex }}"
-                                                wire:model.live="selectedAnswers.{{ $questionIndex }}">
+                                                id="chk_{{ $questionIndex }}_{{ $answerIndex }}" value="{{ $answer }}"
+                                                data-index="{{ $answerIndex }}"
+                                                wire:model.live="selectedAnswers.{{ $questionIndex }}" name="answer[]">
+
                                             <label class="form-check-label ms-2"
                                                 for="chk_{{ $questionIndex }}_{{ $answerIndex }}">{{ $answer }}</label>
                                         </div>
@@ -139,8 +149,9 @@
                                 <div class="d-flex flex-wrap gap-4">
                                     @foreach ($question['answers'] as $answerIndex => $answer)
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="question_{{ $questionIndex }}"
-                                                id="rad_{{ $questionIndex }}_{{ $answerIndex }}" value="{{ $answerIndex }}"
+                                            <input class="form-check-input" type="radio" name="answer[]"
+                                                id="rad_{{ $questionIndex }}_{{ $answerIndex }}"
+                                                value="{{ $answer }}" data-index="{{ $answerIndex }}"
                                                 wire:model.live="selectedAnswers.{{ $questionIndex }}">
                                             <label class="form-check-label ms-2"
                                                 for="rad_{{ $questionIndex }}_{{ $answerIndex }}">{{ $answer }}</label>
@@ -163,6 +174,7 @@
                         </div> --}}
                         @if (!collect($selectedAnswers)->every(fn($a) => is_null($a) || $a === '' || $a === []))
                             <div class="price-value">{{ $this->totalPrice() }} EGP</div>
+                            <input type="hidden" name="totalPrice" value="{{ $this->totalPrice() }}">
                         @endif
 
                     </div>

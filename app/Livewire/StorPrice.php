@@ -18,6 +18,7 @@ class StorPrice extends Component
         $this->product = $product;
         // نقوم بتهيئة المصفوفة لتجنب أي أخطاء
         $this->initializeAnswers();
+        $this->totalPrice();
     }
 
     /**
@@ -43,20 +44,16 @@ class StorPrice extends Component
 
     public function totalPrice()
     {
-        // نتحقق أولاً إذا كل الإجابات فاضية
         $allEmpty = collect($this->selectedAnswers)->every(function ($answer) {
             return is_null($answer) || $answer === '' || $answer === [] || $answer === false;
         });
 
-        // لو كلها فاضية → نرجع السعر الأساسي فقط بدون حساب أي إضافات
         if ($allEmpty) {
             return (float) $this->product->price;
         }
 
-        // نبدأ بالسعر الأساسي للمنتج
         $total = (float) $this->product->price;
 
-        // نضيف الأسعار بناءً على الإجابات المختارة
         foreach ($this->product->questions as $questionIndex => $question) {
             $selection = $this->selectedAnswers[$questionIndex] ?? null;
 
@@ -68,15 +65,17 @@ class StorPrice extends Component
                 case 'select':
                 case 'radio':
                 case 'number':
-                    $selectedIndex = (int) $selection;
-                    if (isset($question['price'][$selectedIndex])) {
+                    // ابحث عن رقم الإجابة من النص
+                    $selectedIndex = array_search($selection, $question['answers']);
+                    if ($selectedIndex !== false && isset($question['price'][$selectedIndex])) {
                         $total += (float) $question['price'][$selectedIndex];
                     }
                     break;
 
                 case 'chickbox':
-                    foreach ($selection as $selectedIndex) {
-                        if (isset($question['price'][$selectedIndex])) {
+                    foreach ($selection as $answerText) {
+                        $selectedIndex = array_search($answerText, $question['answers']);
+                        if ($selectedIndex !== false && isset($question['price'][$selectedIndex])) {
                             $total += (float) $question['price'][$selectedIndex];
                         }
                     }
@@ -86,6 +85,7 @@ class StorPrice extends Component
 
         return $total;
     }
+
 
 
     public function render()
