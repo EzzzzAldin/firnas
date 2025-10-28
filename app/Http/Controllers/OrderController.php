@@ -13,7 +13,7 @@ class OrderController extends Controller
     public function createSession(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        dd($request);
+   
 
         $currency = "EGP";
         $amount = number_format($product->price, 2, '.', '');
@@ -24,7 +24,7 @@ class OrderController extends Controller
         $customerMobile = $request->input('mobile', '01000000000');
         $customerName = $request->input('name', 'Guest User');
 
-
+        dd($request->all());
         $order = Order::create([
             'user_id' => null,
             'product_id' => $product->id,

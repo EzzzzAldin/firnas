@@ -105,7 +105,7 @@
                                     <span class="employee-label flex-grow-1">{{ $question['question'] }}</span>
                                     <div class="d-flex flex-wrap align-items-center gap-2" role="group">
                                         {{-- سنعرض الأرقام كخيارات راديو --}}
-                                        <input type="hidden" value="{{ $question['question'] }}" name="question[]">
+                                        <input type="hidden" value="{{ $question['question'] }}" name="question[][number][]">
                                         @foreach ($question['answers'] as $answerIndex => $answer)
                                             <input type="radio" class="btn-check employee-input" name="answer[]"
                                                 id="num_{{ $questionIndex }}_{{ $answerIndex }}" value="{{ $answer }}"
@@ -124,15 +124,15 @@
                         @case('chickbox')
                             {{-- انتبه للخطأ الإملائي --}}
                             <div class="mb-4 box-employee border rounded bg-white p-3">
-                                <label class="title d-block mb-2 font-weight-bold">{{ $question['question'] }}</label>
+                                <label class="title d-block mb-2 font-weight-bold">تتتتتت{{ $question['question'] }}</label>
                                 <div class="d-flex flex-wrap gap-4">
-                                    <input type="hidden" value="{{ $question['question'] }}" name="question[]">
+                                    <input type="hidden" value="{{ $question['question'] }}" name="question[][chickbox][]">
                                     @foreach ($question['answers'] as $answerIndex => $answer)
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox"
                                                 id="chk_{{ $questionIndex }}_{{ $answerIndex }}" value="{{ $answer }}"
                                                 data-index="{{ $answerIndex }}"
-                                                wire:model.live="selectedAnswers.{{ $questionIndex }}" name="answer[]">
+                                                wire:model.live="selectedAnswers.{{ $questionIndex }}" name="answer[{{ $questionIndex }}][chickbox][]">
 
                                             <label class="form-check-label ms-2"
                                                 for="chk_{{ $questionIndex }}_{{ $answerIndex }}">{{ $answer }}</label>
@@ -147,9 +147,10 @@
                             <div class="mb-4 box-employee border rounded bg-white p-3">
                                 <label class="title  d-block mb-2 font-weight-bold">{{ $question['question'] }}</label>
                                 <div class="d-flex flex-wrap gap-4">
+                                    <input type="hidden" value="{{ $question['question'] }}" name="question[][radio][]">
                                     @foreach ($question['answers'] as $answerIndex => $answer)
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="answer[]"
+                                            <input class="form-check-input" type="radio" name="answer[{{ $questionIndex }}]"
                                                 id="rad_{{ $questionIndex }}_{{ $answerIndex }}"
                                                 value="{{ $answer }}" data-index="{{ $answerIndex }}"
                                                 wire:model.live="selectedAnswers.{{ $questionIndex }}">

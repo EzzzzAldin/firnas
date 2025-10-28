@@ -23,4 +23,13 @@ class Order extends Model
         'customer_name',
         'order_reference',
     ];
+    public $casts = [
+        'questions' => 'array',
+        'answers' => 'array',
+    ];
+    
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }
