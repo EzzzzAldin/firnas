@@ -13,7 +13,7 @@ class OrderController extends Controller
     public function createSession(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-   
+
 
         $currency = "EGP";
         $amount = number_format($product->price, 2, '.', '');
@@ -24,7 +24,27 @@ class OrderController extends Controller
         $customerMobile = $request->input('mobile', '01000000000');
         $customerName = $request->input('name', 'Guest User');
 
-        dd($request->all());
+
+        $questions = $request->input('question', []);
+        $answers = $request->input('answer', []);
+
+        $mergedQA = [];
+
+        foreach ($answers as $index => $answer) {
+            $questionData = $questions[$index] ?? [];
+
+            // استخراج اسم ونوع السؤال
+            $type = key($questionData); // مثل 'text' أو 'select' أو 'chickbox'
+            $questionText = $questionData[$type][0] ?? null;
+
+            // نضيف السؤال والإجابات بشكل منظم
+            $mergedQA[] = [
+                'type' => $type,
+                'question' => $questionText,
+                'answer' => $answer, // ممكن تكون string أو array (في حالة checkbox)
+            ];
+        }
+
         $order = Order::create([
             'user_id' => null,
             'product_id' => $product->id,
@@ -36,9 +56,10 @@ class OrderController extends Controller
             'customer_mobile' => $customerMobile,
             'customer_name' => $customerName,
             'order_reference' => $orderId,
+            'questions' => $mergedQA,
+
         ]);
-
-
+        dd($mergedQA);
         $merchantId = env('KASHIER_MERCHANT_ID');
         $apiKey = env('KASHIER_API_KEY');
         $secretKey = env('KASHIER_SECRET_KEY');

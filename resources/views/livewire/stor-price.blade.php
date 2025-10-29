@@ -75,7 +75,7 @@
                             <div class="mb-4">
                                 <input type="text" class="form-control" name="answer[]"
                                     placeholder="{{ $question['question'] }}" required>
-                                <input type="hidden" value="{{ $question['question'] }}" name="question[]">
+                                <input type="hidden" value="{{ $question['question'] }}" name="question[{{ $questionIndex }}][text][]">
                                 {{-- لا داعي لإضافة سعر هنا --}}
                             </div>
                         @break
@@ -84,7 +84,7 @@
                         @case('select')
                             <div class="mb-4">
                                 {{-- ربط الـ select بالمتغير في الكومبوننت --}}
-                                <input type="hidden" value="{{ $question['question'] }}" name="question[]">
+                                <input type="hidden" value="{{ $question['question'] }}" name="question[{{ $questionIndex }}][select][]">
                                 <select wire:model.live="selectedAnswers.{{ $questionIndex }}"
                                     class="form-select custom-select-rtl" required name="answer[]">
                                     <option value="" class="title" selected>{{ $question['question'] }}</option>
@@ -105,7 +105,7 @@
                                     <span class="employee-label flex-grow-1">{{ $question['question'] }}</span>
                                     <div class="d-flex flex-wrap align-items-center gap-2" role="group">
                                         {{-- سنعرض الأرقام كخيارات راديو --}}
-                                        <input type="hidden" value="{{ $question['question'] }}" name="question[][number][]">
+                                        <input type="hidden" value="{{ $question['question'] }}" name="question[{{ $questionIndex }}][number][]">
                                         @foreach ($question['answers'] as $answerIndex => $answer)
                                             <input type="radio" class="btn-check employee-input" name="answer[]"
                                                 id="num_{{ $questionIndex }}_{{ $answerIndex }}" value="{{ $answer }}"
@@ -124,9 +124,9 @@
                         @case('chickbox')
                             {{-- انتبه للخطأ الإملائي --}}
                             <div class="mb-4 box-employee border rounded bg-white p-3">
-                                <label class="title d-block mb-2 font-weight-bold">تتتتتت{{ $question['question'] }}</label>
+                                <label class="title d-block mb-2 font-weight-bold">{{ $question['question'] }}</label>
                                 <div class="d-flex flex-wrap gap-4">
-                                    <input type="hidden" value="{{ $question['question'] }}" name="question[][chickbox][]">
+                                    <input type="hidden" value="{{ $question['question'] }}" name="question[{{ $questionIndex }}][chickbox][]">
                                     @foreach ($question['answers'] as $answerIndex => $answer)
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox"
@@ -147,7 +147,7 @@
                             <div class="mb-4 box-employee border rounded bg-white p-3">
                                 <label class="title  d-block mb-2 font-weight-bold">{{ $question['question'] }}</label>
                                 <div class="d-flex flex-wrap gap-4">
-                                    <input type="hidden" value="{{ $question['question'] }}" name="question[][radio][]">
+                                    <input type="hidden" value="{{ $question['question'] }}" name="question[{{ $questionIndex }}][radio][]">
                                     @foreach ($question['answers'] as $answerIndex => $answer)
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="answer[{{ $questionIndex }}]"

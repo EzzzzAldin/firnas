@@ -22,12 +22,14 @@ class Order extends Model
         'customer_mobile',
         'customer_name',
         'order_reference',
+        'questions',
+
     ];
     public $casts = [
         'questions' => 'array',
-        'answers' => 'array',
+       
     ];
-    
+
     public function product()
     {
         return $this->belongsTo(Product::class);
